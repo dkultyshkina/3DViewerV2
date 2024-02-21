@@ -1,0 +1,926 @@
+#include <gtest/gtest.h>
+
+#include <string>
+
+#include "../Model/Facade.h"
+#include "../Model/FacadeOperationResult.h"
+#include "../Model/Model.h"
+#include "../Model/MovedModel.h"
+#include "../Model/RotatedModel.h"
+#include "../Model/ScaledModel.h"
+
+TEST(TestParserFile, ParserFileFirst) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserFileSecond) {
+  std::string file_name = "some_file.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  ASSERT_EQ(result.GetResultOfOperation(), false);
+  ASSERT_EQ(result.GetErrorMessage(), "File doesn't open!");
+}
+
+TEST(TestParserFile, ParserFileThird) {
+  std::string file_name = "tests/obj1.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 0);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), 1);
+}
+
+TEST(TestParserFile, ParserFileFourth) {
+  std::string file_name = "tests/obj2.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(vertices.size(), 0);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelFirst) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.MoveModel(2, 3, 4);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 2);
+  ASSERT_EQ(round(vertices[1]), 2);
+  ASSERT_EQ(round(vertices[2]), 5);
+  ASSERT_EQ(round(vertices[3]), 2);
+  ASSERT_EQ(round(vertices[4]), 2);
+  ASSERT_EQ(round(vertices[5]), 5);
+  ASSERT_EQ(round(vertices[6]), 2);
+  ASSERT_EQ(round(vertices[7]), 5);
+  ASSERT_EQ(round(vertices[8]), 3);
+  ASSERT_EQ(round(vertices[9]), 2);
+  ASSERT_EQ(round(vertices[10]), 2);
+  ASSERT_EQ(round(vertices[11]), 5);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelSecond) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.MoveModel(-1, -47, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(round(vertices[0]), -1);
+  ASSERT_EQ(round(vertices[1]), -48);
+  ASSERT_EQ(round(vertices[2]), -9);
+  ASSERT_EQ(round(vertices[3]), -1);
+  ASSERT_EQ(round(vertices[4]), -48);
+  ASSERT_EQ(round(vertices[5]), -9);
+  ASSERT_EQ(round(vertices[6]), -1);
+  ASSERT_EQ(round(vertices[7]), -46);
+  ASSERT_EQ(round(vertices[8]), -11);
+  ASSERT_EQ(round(vertices[9]), -1);
+  ASSERT_EQ(round(vertices[10]), -49);
+  ASSERT_EQ(round(vertices[11]), -9);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelThird) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.MoveModel(0, -47, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -48);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -48);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), -46);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -49);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelFourth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.MoveModel(2, 0, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 2);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 2);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 2);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 2);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelFifth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.MoveModel(0, 0, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), -9);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), -9);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), -11);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), -9);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserMovedModelSixth) {
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.MoveModel(1, 1, 1);
+  ASSERT_EQ(result.GetResultOfOperation(), false);
+  ASSERT_EQ(result.GetErrorMessage(), "Error! Empty model");
+}
+
+TEST(TestParserFile, ParserRotatedModelFirst) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.RotateModel(2, 3, 4);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), -1);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), -1);
+  ASSERT_EQ(round(vertices[3]), -1);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), -1);
+  ASSERT_EQ(round(vertices[6]), 1);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), 1);
+  ASSERT_EQ(round(vertices[9]), -1);
+  ASSERT_EQ(round(vertices[10]), -1);
+  ASSERT_EQ(round(vertices[11]), -1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedModelSecond) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.RotateModel(-1, -47, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), -1);
+  ASSERT_EQ(round(vertices[1]), 1);
+  ASSERT_EQ(round(vertices[2]), 0);
+  ASSERT_EQ(round(vertices[3]), -1);
+  ASSERT_EQ(round(vertices[4]), 1);
+  ASSERT_EQ(round(vertices[5]), 0);
+  ASSERT_EQ(round(vertices[6]), 1);
+  ASSERT_EQ(round(vertices[7]), -1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), -1);
+  ASSERT_EQ(round(vertices[10]), 1);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedModelThird) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.RotateModel(0, -47, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), -1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), -1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), 1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), -1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedModelFourth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.RotateModel(2, 0, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), 1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), 1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), -2);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), 2);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedModelFifth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.RotateModel(0, 0, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), 1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), 1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 1);
+  ASSERT_EQ(round(vertices[7]), -1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), -1);
+  ASSERT_EQ(round(vertices[10]), 1);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedModelSixth) {
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.RotateModel(1, 1, 1);
+  ASSERT_EQ(result.GetResultOfOperation(), false);
+  ASSERT_EQ(result.GetErrorMessage(), "Error! Empty model");
+}
+
+TEST(TestParserFile, ParserScaledModelFirst) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.ScaleModel(2, 3, 4);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), -1);
+  ASSERT_EQ(round(vertices[1]), -3);
+  ASSERT_EQ(round(vertices[2]), 4);
+  ASSERT_EQ(round(vertices[3]), -1);
+  ASSERT_EQ(round(vertices[4]), -3);
+  ASSERT_EQ(round(vertices[5]), 4);
+  ASSERT_EQ(round(vertices[6]), 1);
+  ASSERT_EQ(round(vertices[7]), 4);
+  ASSERT_EQ(round(vertices[8]), -4);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -5);
+  ASSERT_EQ(round(vertices[11]), 4);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserScaledModelSecond) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.ScaleModel(-1, -47, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), 0);
+  ASSERT_EQ(round(vertices[2]), 0);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), 0);
+  ASSERT_EQ(round(vertices[5]), 0);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 0);
+  ASSERT_EQ(round(vertices[8]), 0);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), 0);
+  ASSERT_EQ(round(vertices[11]), 0);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserScaledModelThird) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.ScaleModel(0, -47, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), 0);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), 0);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 0);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), 0);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserScaledModelFourth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.ScaleModel(2, 0, 0);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), -1);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), 1);
+  ASSERT_EQ(round(vertices[3]), -1);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), 1);
+  ASSERT_EQ(round(vertices[6]), 1);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), -1);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), 1);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserScaledModelFifth) {
+  std::string file_name = "tests/obj.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  result = facad.ScaleModel(0, 0, -10);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<unsigned int> lines = (*model).GetLines();
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  ASSERT_EQ(lines.size(), 24);
+  ASSERT_EQ(vertices.size(), 12);
+  ASSERT_EQ(round(vertices[0]), 0);
+  ASSERT_EQ(round(vertices[1]), -1);
+  ASSERT_EQ(round(vertices[2]), 0);
+  ASSERT_EQ(round(vertices[3]), 0);
+  ASSERT_EQ(round(vertices[4]), -1);
+  ASSERT_EQ(round(vertices[5]), 0);
+  ASSERT_EQ(round(vertices[6]), 0);
+  ASSERT_EQ(round(vertices[7]), 1);
+  ASSERT_EQ(round(vertices[8]), 0);
+  ASSERT_EQ(round(vertices[9]), 0);
+  ASSERT_EQ(round(vertices[10]), -2);
+  ASSERT_EQ(round(vertices[11]), 0);
+  ASSERT_EQ(lines[0], 0);
+  ASSERT_EQ(lines[1], 1);
+  ASSERT_EQ(lines[2], 1);
+  ASSERT_EQ(lines[3], 2);
+  ASSERT_EQ(lines[4], 2);
+  ASSERT_EQ(lines[5], 0);
+  ASSERT_EQ(lines[6], 2);
+  ASSERT_EQ(lines[7], 3);
+  ASSERT_EQ(lines[8], 3);
+  ASSERT_EQ(lines[9], 4);
+  ASSERT_EQ(lines[10], 4);
+  ASSERT_EQ(lines[11], 2);
+  ASSERT_EQ(lines[12], 5);
+  ASSERT_EQ(lines[13], 2);
+  ASSERT_EQ(lines[14], 2);
+  ASSERT_EQ(lines[15], 6);
+  ASSERT_EQ(lines[16], 6);
+  ASSERT_EQ(lines[17], 5);
+  ASSERT_EQ(lines[18], 5);
+  ASSERT_EQ(lines[19], 2);
+  ASSERT_EQ(lines[20], 2);
+  ASSERT_EQ(lines[21], 6);
+  ASSERT_EQ(lines[22], 6);
+  ASSERT_EQ(lines[23], 5);
+}
+
+TEST(TestParserFile, ParserRotatedScaleSixth) {
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.ScaleModel(1, 1, 1);
+  ASSERT_EQ(result.GetResultOfOperation(), false);
+  ASSERT_EQ(result.GetErrorMessage(), "Error! Empty model");
+}
+
+TEST(TestСonstructor, ParserСonstructor) {
+  viewer::Model();
+  viewer::FileReader();
+  viewer::OffsetScene();
+}
+
+TEST(TestModel, ParserModel) {
+  std::vector<double> vertices = {1, 2, 3};
+  std::vector<unsigned int> lines = {1, 2, 3};
+  viewer::Model model(vertices, lines);
+  model.SetLines(lines);
+}
+
+TEST(OffsetModel, OffsetModel) {
+  std::string file_name = "tests/obj3.obj";
+  viewer::Facade facad;
+  viewer::FacadeOperationResult result = facad.LoadScene(file_name);
+  ASSERT_EQ(result.GetResultOfOperation(), true);
+  viewer::Model* model = facad.GetModel();
+  std::vector<double> vertices = (*model).GetVertices();
+  std::vector<double> offset = facad.GetOffset();
+  ASSERT_EQ(offset[0], 1);
+  ASSERT_EQ(offset[1], -75.45);
+  ASSERT_EQ(offset[2], -342.85);
+  ASSERT_EQ(offset[3], 123.123);
+  ASSERT_EQ(offset[4], 456.321);
+  ASSERT_EQ(offset[5], 12.32);
+}
+
+TEST(OffsetModel, OffsetSecond) {
+  viewer::Facade facad;
+  std::vector<double> offset = facad.GetOffset();
+  ASSERT_EQ(offset[0], 0);
+  ASSERT_EQ(offset[1], 0);
+  ASSERT_EQ(offset[2], 0);
+  ASSERT_EQ(offset[3], 0);
+  ASSERT_EQ(offset[4], 0);
+  ASSERT_EQ(offset[5], 0);
+}
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
